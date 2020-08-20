@@ -4,7 +4,7 @@ services:
   authentication-service:
     image: drivehub.azurecr.io/soyateam/authentication-service:develop
     ports:
-      - 8083:8080
+      - 3000:8080
     env_file:
     - ./env/mongo.env
     - ./env/authentication.env
@@ -15,7 +15,7 @@ services:
   web-ui: 
     image: drivehub.azurecr.io/soyateam/web-ui:develop
     ports:
-    - 80:8080
+    - 1500:8080
     depends_on:
     - authentication-service
     - brain-service
@@ -23,9 +23,9 @@ services:
   brain-service: 
     image: drivehub.azurecr.io/soyateam/brain-service:develop
     ports:
-      - 8080:8080
+      - 3001:8080
     depends_on:
-    - hierarchy-service
+    - group-service
     - task-service
     env_file:
     - ./env/node.env
@@ -33,25 +33,24 @@ services:
   task-service: 
     image: drivehub.azurecr.io/soyateam/task-service:develop
     ports: 
-    - 8081:8080
+    - 3003:8080
     depends_on:
     - mongo
     env_file:
     - ./env/mongo.env
     - ./env/node.env
 
-  hierarchy-service:
-    image: drivehub.azurecr.io/soyateam/hierarchy-service:develop
+  group-service:
+    image: drivehub.azurecr.io/soyateam/group-service:develop
     ports:
-    - 8082:8080
+    - 3004:8080
     env_file:
     - ./env/node.env
+    - ./env/mongo.env
 
   mongo:
     image: mongo:latest
     ports:
       - "27017:27017"
-    volumes:
-      - mongo-data-volume:/data/db
 
 
