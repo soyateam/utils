@@ -1,0 +1,3 @@
+{"name":"[MongoDB] trying to mongo server:  mongodb://mongo:27017","level":"info","message":"connectToMongo","service":"group-Service","timestamp":"2020-08-25 12:00:15"}
+{"name":"successfully connected: mongodb://mongo:27017","level":"info","message":"connectToMongo","service":"group-Service","timestamp":"2020-08-25 12:00:15"}
+{"name":"Server running in prod environment on port 8080","level":"info","message":"connectedToServer","service":"group-Service","timestamp":"2020-08-25 12:00:15"}
