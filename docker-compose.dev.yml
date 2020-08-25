@@ -19,8 +19,6 @@ services:
     image: drivehub.azurecr.io/soyateam/task-service:develop
     ports:
       - '3002:8080'
-    build:
-      context: task-service/
     volumes:
       - ./logs/task-service:/usr/src/app/logs/task-service
     environment:
@@ -36,8 +34,6 @@ services:
     image: drivehub.azurecr.io/soyateam/group-service:develop
     ports:
       - '3003:8080'
-    build:
-      context: group-service/
     volumes:
       - ./logs/group-service:/usr/src/app/logs/group-service
     environment:
@@ -53,8 +49,6 @@ services:
     image: drivehub.azurecr.io/soyateam/authentication-service:develop
     ports:
       - '3000:8080'
-    build:
-      context: authentication-service/
     volumes:
       - ./logs/authentication-service:/usr/src/app/logs/authentication-service
     environment:

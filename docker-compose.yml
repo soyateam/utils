@@ -1,60 +1,143 @@
-version: '3'
-services: 
-  authentication-service:
-    image: drivehub.azurecr.io/soyateam/authentication-service:develop
-    ports:
-      - 8083:8080
-    env_file:
-    - ./env/mongo.env
-    - ./env/authentication.env
-    - ./env/node.env
-    depends_on:
-    - mongo
-    environment:
-      - "constraint:node==node-1"
-
-  web-ui: 
+version: '3.5'
+services:
+  web-ui:
     image: drivehub.azurecr.io/soyateam/web-ui:develop
     ports:
-    - 80:8080
+      - '80:8080'
     depends_on:
-    - authentication-service
-    - brain-service
-    environment:
-      - "constraint:node==node-1"
+      - brain-service
+      - authentication-service
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1gb
+        reservations:
+          memory: 256mb
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+      placement:
+        constraints: [node.role == worker]
 
-  brain-service: 
+  brain-service:
     image: drivehub.azurecr.io/soyateam/brain-service:develop
     ports:
-      - 8080:8080
-    depends_on:
-    - group-service
-    - task-service
+      - '3001:8080'
+    volumes:
+      - ./logs/brain-service:/usr/src/app/logs/brain-service
+    environment:
+      LOG_FILE_DIR: logs/brain-service
     env_file:
     - ./env/node.env
-    environment:
-      - "constraint:node==node-1"
-
-  task-service: 
-    image: drivehub.azurecr.io/soyateam/task-service:develop
-    ports: 
-    - 8081:8080
+    restart: always
     depends_on:
-    - mongo
+      - group-service
+      - task-service
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1gb
+        reservations:
+          memory: 256mb
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+      placement:
+        constraints: [node.role == worker]
+
+  task-service:
+    image: drivehub.azurecr.io/soyateam/task-service:develop
+    ports:
+      - '3002:8080'
+    volumes:
+      - ./logs/task-service:/usr/src/app/logs/task-service
+    environment:
+      LOG_FILE_DIR: logs/task-service
     env_file:
     - ./env/mongo.env
     - ./env/node.env
-    environment:
-      - "constraint:node==node-1"
+    restart: always
+    depends_on:
+      - mongo
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1gb
+        reservations:
+          memory: 256mb
+      placement:
+        constraints: [node.role == worker]
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
 
   group-service:
     image: drivehub.azurecr.io/soyateam/group-service:develop
     ports:
-    - 8082:8080
-    env_file:
-    - ./env/node.env
-    - ./env/mongo.env
+      - '3003:8080'
+    volumes:
+      - ./logs/group-service:/usr/src/app/logs/group-service
     environment:
-      - "constraint:node==node-1"
+      LOG_FILE_DIR: logs/group-service
+    env_file:
+    - ./env/mongo.env
+    - ./env/node.env
+    restart: always
+    depends_on:
+      - mongo
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1gb
+        reservations:
+          memory: 256mb
+      placement:
+        constraints: [node.role == worker]
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
 
+  authentication-service:
+    image: drivehub.azurecr.io/soyateam/authentication-service:develop
+    ports:
+      - '3000:8080'
+    volumes:
+      - ./logs/authentication-service:/usr/src/app/logs/authentication-service
+    environment:
+      LOG_FILE_DIR: logs/authentication-service
+    env_file:
+    - ./env/mongo.env
+    - ./env/authentication.env
+    - ./env/node.env
+    restart: always
+    depends_on:
+      - mongo
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1gb
+        reservations:
+          memory: 256mb
+      placement:
+        constraints: [node.role == worker]
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
 
+  mongo:
+    image: mongo:latest
