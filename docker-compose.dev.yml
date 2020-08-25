@@ -1,56 +1,71 @@
-version: '3'
-services: 
-
-  authentication-service:
-    image: drivehub.azurecr.io/soyateam/authentication-service:develop
-    ports:
-      - 3000:8080
-    env_file:
-    - ./env/mongo.env
-    - ./env/authentication.env
-    - ./env/node.env
-    depends_on:
-    - mongo
-
-  web-ui: 
-    image: drivehub.azurecr.io/soyateam/web-ui:develop
-    ports:
-    - 1500:8080
-    depends_on:
-    - authentication-service
-    - brain-service
-
-  brain-service: 
+version: '3.5'
+services:
+  brain-service:
     image: drivehub.azurecr.io/soyateam/brain-service:develop
     ports:
-      - 3001:8080
-    depends_on:
-    - group-service
-    - task-service
+      - '3001:8080'
+    volumes:
+      - ./logs/brain-service:/usr/src/app/logs/brain-service
+    environment:
+      LOG_FILE_DIR: logs/brain-service
     env_file:
     - ./env/node.env
-
-  task-service: 
-    image: drivehub.azurecr.io/soyateam/task-service:develop
-    ports: 
-    - 3003:8080
+    restart: always
     depends_on:
-    - mongo
+      - group-service
+      - task-service
+
+  task-service:
+    image: drivehub.azurecr.io/soyateam/task-service:develop
+    ports:
+      - '3002:8080'
+    build:
+      context: task-service/
+    volumes:
+      - ./logs/task-service:/usr/src/app/logs/task-service
+    environment:
+      LOG_FILE_DIR: logs/task-service
     env_file:
     - ./env/mongo.env
     - ./env/node.env
+    restart: always
+    depends_on:
+      - mongo
 
   group-service:
     image: drivehub.azurecr.io/soyateam/group-service:develop
     ports:
-    - 3004:8080
+      - '3003:8080'
+    build:
+      context: group-service/
+    volumes:
+      - ./logs/group-service:/usr/src/app/logs/group-service
+    environment:
+      LOG_FILE_DIR: logs/group-service
     env_file:
-    - ./env/node.env
     - ./env/mongo.env
+    - ./env/node.env
+    restart: always
+    depends_on:
+      - mongo
+
+  authentication-service:
+    image: drivehub.azurecr.io/soyateam/authentication-service:develop
+    ports:
+      - '3000:8080'
+    build:
+      context: authentication-service/
+    volumes:
+      - ./logs/authentication-service:/usr/src/app/logs/authentication-service
+    environment:
+      LOG_FILE_DIR: logs/authentication-service
+    env_file:
+    - ./env/mongo.env
+    - ./env/authentication.env
+    - ./env/node.env
+    restart: always
+    depends_on:
+      - mongo
 
   mongo:
     image: mongo:latest
-    ports:
-      - "27017:27017"
-
-
