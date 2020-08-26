@@ -4,10 +4,6 @@ services:
     image: drivehub.azurecr.io/soyateam/brain-service:develop
     ports:
       - '3001:8080'
-    volumes:
-      - ./logs/brain-service:/usr/src/app/logs/brain-service
-    environment:
-      LOG_FILE_DIR: logs/brain-service
     env_file:
     - ./env/node.env
     restart: always
@@ -19,10 +15,6 @@ services:
     image: drivehub.azurecr.io/soyateam/task-service:develop
     ports:
       - '3002:8080'
-    volumes:
-      - ./logs/task-service:/usr/src/app/logs/task-service
-    environment:
-      LOG_FILE_DIR: logs/task-service
     env_file:
     - ./env/mongo.env
     - ./env/node.env
@@ -34,10 +26,6 @@ services:
     image: drivehub.azurecr.io/soyateam/group-service:develop
     ports:
       - '3003:8080'
-    volumes:
-      - ./logs/group-service:/usr/src/app/logs/group-service
-    environment:
-      LOG_FILE_DIR: logs/group-service
     env_file:
     - ./env/mongo.env
     - ./env/node.env
@@ -49,10 +37,6 @@ services:
     image: drivehub.azurecr.io/soyateam/authentication-service:develop
     ports:
       - '3000:8080'
-    volumes:
-      - ./logs/authentication-service:/usr/src/app/logs/authentication-service
-    environment:
-      LOG_FILE_DIR: logs/authentication-service
     env_file:
     - ./env/mongo.env
     - ./env/authentication.env
